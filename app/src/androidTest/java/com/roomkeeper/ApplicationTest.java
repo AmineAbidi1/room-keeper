@@ -1,4 +1,4 @@
-package roomkeeper.com.roomkeeper;
+package com.roomkeeper;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
