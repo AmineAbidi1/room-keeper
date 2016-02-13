@@ -16,7 +16,10 @@ import android.view.View;
 import com.roomkeeper.adapters.RoomsAdapter;
 import com.roomkeeper.details.DetailsActivity;
 import com.roomkeeper.models.Room;
+import com.roomkeeper.models.RoomStatus;
+import com.roomkeeper.models.RoomStatuses;
 import com.roomkeeper.models.Rooms;
+import com.roomkeeper.models.Status;
 import com.roomkeeper.network.PearlyApi;
 
 import java.util.List;
@@ -29,7 +32,7 @@ import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
-public class MainActivity extends AppCompatActivity implements Callback<Rooms>, RoomsAdapter.OnItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnItemSelectedListener {
 
     private static final String LOG_TAG = "MainActivityTag";
 
@@ -50,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements Callback<Rooms>, 
         GridLayoutManager mLayoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(mLayoutManager);
 
-        // specify an adapter (see also next example)
         roomsAdapter = new RoomsAdapter(this);
         recyclerView.setAdapter(roomsAdapter);
 
@@ -63,11 +65,11 @@ public class MainActivity extends AppCompatActivity implements Callback<Rooms>, 
             }
         });
 
-        downloadRooms();
+        downloadData();
 
     }
 
-    private void downloadRooms() {
+    private void downloadData() {
         Retrofit retrofit = new Retrofit.Builder()
                 //TODO change whenever pearly api is ready
                 .baseUrl("http://dziubinski.eu/")
@@ -77,11 +79,50 @@ public class MainActivity extends AppCompatActivity implements Callback<Rooms>, 
         PearlyApi pearlyApi = retrofit.create(PearlyApi.class);
 
         //TODO change call whenever pearly api is ready
-        Call<Rooms> call = pearlyApi.getRooms();
+        Call<Rooms> roomsCall = pearlyApi.getRooms();
 
         //asynchronous call
-        call.enqueue(this);
+        roomsCall.enqueue(new Callback<Rooms>() {
+            @Override
+            public void onResponse(Response<Rooms> response, Retrofit retrofit) {
+                List<Room> rooms = response.body().getRooms();
+                for (Room room : rooms) {
+                    Log.d(LOG_TAG, room.getTitle());
+                }
 
+                roomsAdapter.setItems(rooms);
+                roomsAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d(LOG_TAG, "Failed to download Statuse, response: " + t.getMessage());
+            }
+        });
+
+        Call<RoomStatuses> statusesCall = pearlyApi.getStatuses();
+
+        statusesCall.enqueue(new Callback<RoomStatuses>() {
+            @Override
+            public void onResponse(Response<RoomStatuses> response, Retrofit retrofit) {
+                List<RoomStatus> statuses = response.body().getStatuses();
+                for (RoomStatus roomStatus : statuses) {
+                    long roomID = roomStatus.getRoomID();
+                    Log.d(LOG_TAG, "roomID:" + roomID);
+
+                    if (roomStatus.getNoiseLevel() > 10000) {
+                        roomsAdapter.setColorForItem(roomID, Status.FREE);
+                    } else {
+                        roomsAdapter.setColorForItem(roomID, Status.RESERVED);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d(LOG_TAG, "Failed to download Statuses, response: " + t.getMessage());
+            }
+        });
     }
 
     @Override
@@ -106,21 +147,6 @@ public class MainActivity extends AppCompatActivity implements Callback<Rooms>, 
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onResponse(Response<Rooms> response, Retrofit retrofit) {
-        List<Room> rooms = response.body().getRooms();
-        for (Room room : rooms) {
-            Log.d(LOG_TAG, room.getTitle());
-        }
-
-        roomsAdapter.setItems(rooms);
-        roomsAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onFailure(Throwable t) {
-        Log.d(LOG_TAG, "Failed to download, response: " + t.getMessage());
-    }
 
     @Override
     public void onRoomSelectedListener(Room room) {

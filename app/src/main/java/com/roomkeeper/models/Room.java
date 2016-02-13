@@ -3,21 +3,25 @@ package com.roomkeeper.models;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 public class Room implements Serializable {
 
-    private final String image;
+    private long id;
     private String title;
     private String description;
-    private String status;
+    private String image;
+    private Status status;
     private int time;
 
     public Room(String title, String description) {
         this.title = title;
         this.description = description;
         this.image = "http://ryanreporting.com/wp-content/uploads/2013/10/Conference-Room-Rental-in-Orlando-Orange-County-and-Brevard-County-Florida.jpg";
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getTitle() {
@@ -28,12 +32,19 @@ public class Room implements Serializable {
         return description;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
     public String getImage() {
         return image;
+    }
+
+    public Status getStatus() {
+        if (status != null) {
+            return status;
+        }
+        return Status.FREE;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public String getTime() {

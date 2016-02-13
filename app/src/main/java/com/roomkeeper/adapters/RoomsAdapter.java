@@ -1,5 +1,6 @@
 package com.roomkeeper.adapters;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import com.roomkeeper.R;
 import com.roomkeeper.models.Room;
+import com.roomkeeper.models.Status;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +45,24 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         Room room = items.get(position);
 
+        int backGroundColor;
+
+        switch (room.getStatus()) {
+            case FREE:
+                backGroundColor = Color.GREEN;
+                break;
+            case RESERVED:
+                backGroundColor = Color.RED;
+                break;
+            case RESERVED_LOCALLY:
+                backGroundColor = Color.GREEN;
+                break;
+            default:
+                backGroundColor = Color.GREEN;
+        }
+
+        holder.container.setBackgroundColor(backGroundColor);
+
         holder.titile.setText(room.getTitle());
         holder.time.setText(room.getTime());
 
@@ -56,20 +76,30 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return items.size();
     }
 
+    public void setColorForItem(long roomID, Status status) {
+        for (Room room : items) {
+            if (room.getId() == roomID) {
+                room.setStatus(status);
+                notifyItemChanged(items.indexOf(room));
+            }
+        }
+    }
+
+    public interface OnItemSelectedListener {
+        void onRoomSelectedListener(Room room);
+    }
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
-
-        @Bind(R.id.name)
-        TextView titile;
-
-        @Bind(R.id.description)
-        TextView description;
-
-        @Bind(R.id.time)
-        TextView time;
-
         @Bind(R.id.image)
         public ImageView image;
+        @Bind(R.id.item_room_container)
+        View container;
+        @Bind(R.id.name)
+        TextView titile;
+        @Bind(R.id.description)
+        TextView description;
+        @Bind(R.id.time)
+        TextView time;
 
         public ItemViewHolder(View v) {
             super(v);
@@ -84,9 +114,5 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
 
 
-    }
-
-    public interface OnItemSelectedListener {
-        void onRoomSelectedListener(Room room);
     }
 }
