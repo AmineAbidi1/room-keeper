@@ -5,27 +5,40 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.roomkeeper.adapters.RoomAdapter;
+import com.roomkeeper.adapters.RoomsAdapter;
+import com.roomkeeper.models.Room;
+import com.roomkeeper.models.Rooms;
+import com.roomkeeper.network.PearlyApi;
+
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.GsonConverterFactory;
+import retrofit.Response;
+import retrofit.Retrofit;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements Callback<Rooms> {
 
+    private static final String LOG_TAG = "MainActivityTag";
 
     @Bind(R.id.list)
     RecyclerView recyclerView;
+    private RoomsAdapter roomsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -36,9 +49,8 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        RoomAdapter mAdapter = new RoomAdapter();
-        recyclerView.setAdapter(mAdapter);
-
+        roomsAdapter = new RoomsAdapter();
+        recyclerView.setAdapter(roomsAdapter);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -48,6 +60,26 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        downloadRooms();
+
+    }
+
+    private void downloadRooms() {
+        Retrofit retrofit = new Retrofit.Builder()
+                //TODO change whenever pearly api is ready
+                .baseUrl("http://dziubinski.eu/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        PearlyApi pearlyApi = retrofit.create(PearlyApi.class);
+
+        //TODO change call whenever pearly api is ready
+        Call<Rooms> call = pearlyApi.getRooms();
+
+        //asynchronous call
+        call.enqueue(this);
+
     }
 
     @Override
@@ -70,5 +102,21 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResponse(Response<Rooms> response, Retrofit retrofit) {
+        List<Room> rooms = response.body().getRooms();
+        for (Room room : rooms) {
+            Log.d(LOG_TAG, room.getTitle());
+        }
+
+        roomsAdapter.setItems(rooms);
+        roomsAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onFailure(Throwable t) {
+        Log.d(LOG_TAG, "Failed to download, response: " + t.getMessage());
     }
 }

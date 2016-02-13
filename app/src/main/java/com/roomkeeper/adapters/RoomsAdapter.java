@@ -15,12 +15,12 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class RoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<Room> items = new ArrayList<>();
 
 
-    public RoomAdapter() {
+    public RoomsAdapter() {
         items.add(new Room("Small conference", "Room number 102 "));
         items.add(new Room("Conference", "Desciription long here"));
         items.add(new Room("Conference", "Desciription long here"));
