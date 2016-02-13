@@ -4,8 +4,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.roomkeeper.R;
 import com.roomkeeper.models.Room;
 
@@ -49,7 +51,7 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         holder.titile.setText(room.getTitle());
         //holder.description.setText(room.getDescription());
         //holder.time.setText(room.getStatus());
-
+        //ImageLoader.getInstance().displayImage(room.getImage(), holder.image);
     }
 
     @Override
@@ -68,6 +70,9 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         @Bind(R.id.time)
         TextView time;
+
+        @Bind(R.id.image)
+        public ImageView image;
 
         public ItemViewHolder(View v) {
             super(v);

@@ -4,6 +4,7 @@ import java.util.List;
 
 public class Room {
 
+    private final String image;
     private String title;
     private String description;
     private String status;
@@ -13,6 +14,7 @@ public class Room {
     public Room(String title, String description) {
         this.title = title;
         this.description = description;
+        this.image = "http://ryanreporting.com/wp-content/uploads/2013/10/Conference-Room-Rental-in-Orlando-Orange-County-and-Brevard-County-Florida.jpg";
     }
 
     public String getTitle() {
@@ -25,5 +27,9 @@ public class Room {
 
     public String getStatus() {
         return status;
+    }
+
+    public String getImage() {
+        return image;
     }
 }
