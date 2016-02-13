@@ -47,8 +47,8 @@ public class RoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         Room room = items.get(position);
 
         holder.titile.setText(room.getTitle());
-        holder.description.setText(room.getDescription());
-        holder.status.setText(room.getStatus());
+        //holder.description.setText(room.getDescription());
+        //holder.time.setText(room.getStatus());
 
     }
 
@@ -66,8 +66,8 @@ public class RoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         @Bind(R.id.description)
         TextView description;
 
-        @Bind(R.id.status)
-        TextView status;
+        @Bind(R.id.time)
+        TextView time;
 
         public ItemViewHolder(View v) {
             super(v);
