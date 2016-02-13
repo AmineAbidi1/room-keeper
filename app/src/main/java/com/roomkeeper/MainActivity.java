@@ -1,5 +1,6 @@
 package com.roomkeeper;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.roomkeeper.adapters.RoomsAdapter;
+import com.roomkeeper.details.DetailsActivity;
 import com.roomkeeper.models.Room;
 import com.roomkeeper.models.Rooms;
 import com.roomkeeper.network.PearlyApi;
@@ -27,7 +29,7 @@ import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
-public class MainActivity extends AppCompatActivity implements Callback<Rooms> {
+public class MainActivity extends AppCompatActivity implements Callback<Rooms>, RoomsAdapter.OnItemSelectedListener {
 
     private static final String LOG_TAG = "MainActivityTag";
 
@@ -49,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements Callback<Rooms> {
         recyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        roomsAdapter = new RoomsAdapter();
+        roomsAdapter = new RoomsAdapter(this);
         recyclerView.setAdapter(roomsAdapter);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -118,5 +120,12 @@ public class MainActivity extends AppCompatActivity implements Callback<Rooms> {
     @Override
     public void onFailure(Throwable t) {
         Log.d(LOG_TAG, "Failed to download, response: " + t.getMessage());
+    }
+
+    @Override
+    public void onRoomSelectedListener(Room room) {
+        Intent intent = new Intent(this, DetailsActivity.class);
+        intent.putExtra(DetailsActivity.EXTRA_ROOM, room);
+        startActivity(intent);
     }
 }

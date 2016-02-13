@@ -1,15 +1,18 @@
 package com.roomkeeper.models;
 
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
-public class Room {
+public class Room implements Serializable {
 
     private final String image;
     private String title;
     private String description;
     private String status;
-
-    private List<Reservation> reservations;
+    private int time;
 
     public Room(String title, String description) {
         this.title = title;
@@ -31,5 +34,12 @@ public class Room {
 
     public String getImage() {
         return image;
+    }
+
+    public String getTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("mm-ss", Locale.getDefault());
+        String time = sdf.format(new Date(System.currentTimeMillis()));
+
+        return time;
     }
 }

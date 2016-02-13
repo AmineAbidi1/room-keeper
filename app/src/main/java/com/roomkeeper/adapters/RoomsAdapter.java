@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.roomkeeper.R;
 import com.roomkeeper.models.Room;
 
@@ -20,15 +19,11 @@ import butterknife.ButterKnife;
 public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<Room> items = new ArrayList<>();
+    private OnItemSelectedListener listener;
 
 
-    public RoomsAdapter() {
-        items.add(new Room("Small conference", "Room number 102 "));
-        items.add(new Room("Conference", "Desciription long here"));
-        items.add(new Room("Conference", "Desciription long here"));
-        items.add(new Room("Conference", "Desciription long here"));
-        items.add(new Room("Conference", "Desciription long here"));
-        items.add(new Room("Conference", "Desciription long here"));
+    public RoomsAdapter(OnItemSelectedListener listener) {
+        this.listener = listener;
     }
 
     public void setItems(List<Room> items) {
@@ -49,10 +44,23 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         Room room = items.get(position);
 
         holder.titile.setText(room.getTitle());
+        holder.time.setText(room.getTime());
+
         //holder.description.setText(room.getDescription());
         //holder.time.setText(room.getStatus());
         //ImageLoader.getInstance().displayImage(room.getImage(), holder.image);
     }
+/*
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List<Object> payloads) {
+        super.onBindViewHolder(holder, position, payloads);
+
+        ItemViewHolder ourHolder = (ItemViewHolder) holder;
+        Room room = items.get(position);
+
+        ourHolder.time.setText(room.getTime());
+
+    }*/
 
     @Override
     public int getItemCount() {
@@ -77,8 +85,19 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         public ItemViewHolder(View v) {
             super(v);
             ButterKnife.bind(this, v);
+
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onRoomSelectedListener(items.get(getAdapterPosition()));
+                }
+            });
         }
 
 
+    }
+
+    public interface OnItemSelectedListener {
+        void onRoomSelectedListener(Room room);
     }
 }
