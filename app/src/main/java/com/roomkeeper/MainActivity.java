@@ -14,6 +14,7 @@ import android.view.View;
 import com.roomkeeper.adapters.RoomAdapter;
 
 import butterknife.Bind;
+import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,13 +29,14 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        ButterKnife.bind(this);
+
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
         RoomAdapter mAdapter = new RoomAdapter(null);
         recyclerView.setAdapter(mAdapter);
-
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
