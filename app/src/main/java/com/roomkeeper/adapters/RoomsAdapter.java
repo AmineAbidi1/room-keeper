@@ -50,17 +50,6 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         //holder.time.setText(room.getStatus());
         //ImageLoader.getInstance().displayImage(room.getImage(), holder.image);
     }
-/*
-    @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List<Object> payloads) {
-        super.onBindViewHolder(holder, position, payloads);
-
-        ItemViewHolder ourHolder = (ItemViewHolder) holder;
-        Room room = items.get(position);
-
-        ourHolder.time.setText(room.getTime());
-
-    }*/
 
     @Override
     public int getItemCount() {
