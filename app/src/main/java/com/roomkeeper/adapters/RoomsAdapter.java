@@ -173,14 +173,22 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    listener.onRoomSelectedListener(items.get(getAdapterPosition()));
+                    try {
+                        listener.onRoomSelectedListener(items.get(getAdapterPosition()));
+                    } catch (ArrayIndexOutOfBoundsException e) {
+
+                    }
                 }
             });
 
             v.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    listener.onRoomLongClickedListener(items.get(getAdapterPosition()));
+                    try {
+                        listener.onRoomLongClickedListener(items.get(getAdapterPosition()));
+                    } catch (ArrayIndexOutOfBoundsException e) {
+
+                    }
                     return false;
                 }
             });
