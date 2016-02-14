@@ -35,6 +35,10 @@ public class RoomStatus {
         return temperature;
     }
 
+    public boolean isStatus() {
+        return getNoiseLevel() < 50;
+    }
+
     public Reservation getCurrentReservation() {
         return currentReservation;
     }

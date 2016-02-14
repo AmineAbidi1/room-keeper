@@ -11,11 +11,15 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.roomkeeper.R;
+import com.roomkeeper.models.Reservation;
 import com.roomkeeper.models.Room;
+import com.roomkeeper.models.RoomStatus;
 import com.roomkeeper.models.Status;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -23,7 +27,9 @@ import butterknife.ButterKnife;
 public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<Room> items = new ArrayList<>();
+
     private OnItemSelectedListener listener;
+    private Map<Long, RoomStatus> statuses = new HashMap<>();
 
 
     public RoomsAdapter(OnItemSelectedListener listener) {
@@ -34,6 +40,10 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.items = items;
     }
 
+    public void setStatuses(Map<Long, RoomStatus> statuses) {
+        this.statuses = statuses;
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
@@ -41,15 +51,34 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return new ItemViewHolder(v);
     }
 
+    private Status getStatus(Room room, RoomStatus status) {
+        if (status == null || status.getCurrentReservation() == null) {
+            return Status.FREE;
+        }
+
+        if (status.getCurrentReservation().getNickname().equals("Adam")) {
+            return Status.RESERVED_LOCALLY;
+        } else {
+            if (status.getNoiseLevel() > 50) {
+                return Status.RESERVED;
+            } else {
+                return Status.FREE;
+            }
+        }
+    }
+
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder input, int position) {
         ItemViewHolder holder = (ItemViewHolder) input;
 
         Room room = items.get(position);
+        RoomStatus roomStatus = statuses.get(room.getId());
+
+        // It should be added sensor data!
+        Status status = getStatus(room, roomStatus);
 
         int backGroundColor;
-
-        switch (room.getStatus()) {
+        switch (status) {
             case FREE:
                 backGroundColor = Color.GREEN;
                 break;
@@ -79,14 +108,6 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return items.size();
     }
 
-    public void setColorForItem(long roomID, Status status) {
-        for (Room room : items) {
-            if (room.getId() == roomID) {
-                room.setStatus(status);
-                notifyItemChanged(items.indexOf(room));
-            }
-        }
-    }
 
     public interface OnItemSelectedListener {
         void onRoomSelectedListener(Room room);

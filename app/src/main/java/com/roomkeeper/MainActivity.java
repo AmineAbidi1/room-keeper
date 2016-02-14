@@ -29,13 +29,14 @@ import com.roomkeeper.models.Room;
 import com.roomkeeper.models.RoomStatus;
 import com.roomkeeper.models.RoomStatuses;
 import com.roomkeeper.models.Rooms;
-import com.roomkeeper.models.Status;
 import com.roomkeeper.network.PearlyApi;
 import com.roomkeeper.settings.SettingsActivity;
 import com.roomkeeper.settings.SettingsFragment;
 import com.roomkeeper.splashscreen.SplashScreen;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -59,10 +60,11 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
     SwipeRefreshLayout swipeRefreshLayout;
 
     private RoomsAdapter roomsAdapter;
+
     private PearlyApi pearlyApi;
 
     private Handler handler;
-    private Runnable refreshDataTask;
+    private Runnable refreshDataTask, refreshTimeTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,10 +118,23 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
             }
         };
         scheduleRefresh();
+
+        refreshTimeTask = new Runnable() {
+            @Override
+            public void run() {
+                roomsAdapter.notifyDataSetChanged();
+                scheduleTimeUpdate();
+            }
+        };
+        scheduleTimeUpdate();
     }
 
     private void scheduleRefresh() {
         handler.postDelayed(refreshDataTask, 10000);
+    }
+
+    private void scheduleTimeUpdate() {
+        handler.postDelayed(refreshTimeTask, 1000);
     }
 
     public void setupSwipeRefresh(SwipeRefreshLayout view) {
@@ -178,17 +193,14 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
             @Override
             public void onResponse(Response<RoomStatuses> response, Retrofit retrofit) {
                 List<RoomStatus> statuses = response.body().getStatuses();
-                for (RoomStatus roomStatus : statuses) {
-                    long roomID = roomStatus.getRoomID();
-                    Log.d(LOG_TAG, "roomID:" + roomID);
 
-                    //TODO set proper value to decide whether to change status
-                    if (roomStatus.getNoiseLevel() > 10000) {
-                        roomsAdapter.setColorForItem(roomID, Status.FREE);
-                    } else {
-                        roomsAdapter.setColorForItem(roomID, Status.RESERVED);
-                    }
+                Map<Long, RoomStatus> map = new HashMap<>();
+
+                for (RoomStatus roomStatus : statuses) {
+                    map.put(roomStatus.getRoomID(), roomStatus);
                 }
+                roomsAdapter.setStatuses(map);
+                roomsAdapter.notifyDataSetChanged();
                 swipeRefreshLayout.setRefreshing(false);
             }
 
