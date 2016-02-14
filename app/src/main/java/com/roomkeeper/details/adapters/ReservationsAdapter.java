@@ -12,8 +12,6 @@ import com.roomkeeper.models.Reservation;
 import com.roomkeeper.models.Room;
 import com.roomkeeper.models.RoomStatus;
 
-import org.w3c.dom.Text;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,17 +22,14 @@ import butterknife.ButterKnife;
 
 public class ReservationsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private Context context;
-
-    private List<Reservation> items = new ArrayList<>();
-    private OnItemSelectedListener listener;
-
     final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d MMMM yyyy, cccc");
     final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("K:m a");
-
     private final int VIEW_TYPE_SENSOR_DATA = 1;
     private final int VIEW_TYPE_RESERVATION = 2;
     private final int VIEW_TYPE_ROOM_DATA = 3;
+    private Context context;
+    private List<Reservation> items = new ArrayList<>();
+    private OnItemSelectedListener listener;
     private RoomStatus status;
     private Room room;
 
@@ -42,12 +37,12 @@ public class ReservationsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         this.context = context;
         this.listener = listener;
 
-        items.add(new Reservation(1, "1", "Mark", System.currentTimeMillis() + 10000, System.currentTimeMillis() + 20000));
-        items.add(new Reservation(2, "1", "John", System.currentTimeMillis() + 20000, System.currentTimeMillis() + 30000));
-        items.add(new Reservation(3, "1", "Greg", System.currentTimeMillis() + 30000, System.currentTimeMillis() + 40000));
-        items.add(new Reservation(4, "1", "Johanson", System.currentTimeMillis() + 40000, System.currentTimeMillis() + 50000));
-        items.add(new Reservation(5, "1", "Andrew", System.currentTimeMillis() + 50000, System.currentTimeMillis() + 60000));
-        items.add(new Reservation(6, "1", "Rosa", System.currentTimeMillis() + 60000, System.currentTimeMillis() + 70000));
+        items.add(new Reservation(1, 1, "Mark", System.currentTimeMillis() + 10000, System.currentTimeMillis() + 20000));
+        items.add(new Reservation(2, 1, "John", System.currentTimeMillis() + 20000, System.currentTimeMillis() + 30000));
+        items.add(new Reservation(3, 1, "Greg", System.currentTimeMillis() + 30000, System.currentTimeMillis() + 40000));
+        items.add(new Reservation(4, 1, "Johanson", System.currentTimeMillis() + 40000, System.currentTimeMillis() + 50000));
+        items.add(new Reservation(5, 1, "Andrew", System.currentTimeMillis() + 50000, System.currentTimeMillis() + 60000));
+        items.add(new Reservation(6, 1, "Rosa", System.currentTimeMillis() + 60000, System.currentTimeMillis() + 70000));
 
     }
 

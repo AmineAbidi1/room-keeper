@@ -1,6 +1,7 @@
 package com.roomkeeper.adapters;
 
 import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,7 +57,7 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 backGroundColor = Color.RED;
                 break;
             case RESERVED_LOCALLY:
-                backGroundColor = Color.GREEN;
+                backGroundColor = ContextCompat.getColor(holder.image.getContext(), android.R.color.holo_orange_dark);
                 break;
             default:
                 backGroundColor = Color.GREEN;

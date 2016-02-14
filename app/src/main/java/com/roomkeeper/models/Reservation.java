@@ -7,15 +7,19 @@ public class Reservation {
 
     private long id;
     @Expose
-    private String roomID;
+    private long roomID;
     @Expose
     private String nickname;
+    @Expose
+    private String sparkID;
+    @Expose
+    private String phoneNO;
     @Expose
     private long startTime;
     @Expose
     private long endTime;
 
-    public Reservation(long id, String roomID, String nickname, long startTime, long endTime) {
+    public Reservation(long id, long roomID, String nickname, long startTime, long endTime) {
         this.id = id;
         this.roomID = roomID;
         this.nickname = nickname;
@@ -23,7 +27,15 @@ public class Reservation {
         this.endTime = endTime;
     }
 
-    public String getRoomID() {
+    public Reservation(long roomID, String nickname, String phoneNO, String sparkID, long startTime, long endTime) {
+        this.id = id;
+        this.roomID = roomID;
+        this.nickname = nickname;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
+    public long getRoomID() {
         return roomID;
     }
 

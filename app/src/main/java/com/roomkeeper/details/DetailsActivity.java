@@ -1,15 +1,29 @@
 package com.roomkeeper.details;
 
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
+import android.text.format.DateFormat;
 import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -18,10 +32,15 @@ import com.roomkeeper.details.adapters.ReservationsAdapter;
 import com.roomkeeper.models.Reservation;
 import com.roomkeeper.models.Room;
 import com.roomkeeper.models.RoomStatus;
-import com.roomkeeper.models.Status;
+import com.roomkeeper.network.PearlyApi;
+import com.roomkeeper.settings.SettingsFragment;
+
+import java.util.Calendar;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import retrofit.GsonConverterFactory;
+import retrofit.Retrofit;
 
 public class DetailsActivity extends AppCompatActivity implements ReservationsAdapter.OnItemSelectedListener {
 
@@ -37,6 +56,7 @@ public class DetailsActivity extends AppCompatActivity implements ReservationsAd
     @Bind(R.id.image)
     ImageView image;
     private ReservationsAdapter reservationAdapter;
+    private PearlyApi pearlyApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,19 +71,19 @@ public class DetailsActivity extends AppCompatActivity implements ReservationsAd
             finish();
         }
 
+        Retrofit retrofit = new Retrofit.Builder()
+                //TODO change whenever pearly api is ready
+                .baseUrl("http://dziubinski.eu/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        pearlyApi = retrofit.create(PearlyApi.class);
+
         status = (RoomStatus) getIntent().getExtras().get(EXTRA_STATUS);
 
         initToolbar();
 
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        setUpAddingReservationDialogs();
 
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mLayoutManager);
@@ -73,6 +93,105 @@ public class DetailsActivity extends AppCompatActivity implements ReservationsAd
         reservationAdapter.setRoom(room);
 
         recyclerView.setAdapter(reservationAdapter);
+    }
+
+    private void setUpAddingReservationDialogs() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(DetailsActivity.this);
+                builder.setTitle("ROOM RESERVATION");
+
+                final Button chooseDateButton = new Button(DetailsActivity.this);
+                chooseDateButton.setText("Set Date");
+
+                chooseDateButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final Calendar c = Calendar.getInstance();
+                        int year = c.get(Calendar.YEAR);
+                        final int month = c.get(Calendar.MONTH);
+                        int day = c.get(Calendar.DAY_OF_MONTH);
+                        new DatePickerDialog(DetailsActivity.this, new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                chooseDateButton.setText("Date set to:    " + year + " " + monthOfYear + " " + dayOfMonth);
+                            }
+                        }, year, month, day).show();
+                    }
+                });
+
+
+                final Button chooseTimeButton = new Button(DetailsActivity.this);
+                chooseTimeButton.setText("Set Time");
+                chooseTimeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final Calendar c = Calendar.getInstance();
+                        int hour = c.get(Calendar.HOUR_OF_DAY);
+                        int minute = c.get(Calendar.MINUTE);
+
+                        // Create a new instance of TimePickerDialog and return it
+                        new TimePickerDialog(DetailsActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                chooseTimeButton.setText("Time set to:    " + hourOfDay + " : " + minute);
+                            }
+                        }, hour, minute, DateFormat.is24HourFormat(DetailsActivity.this)).show();
+                    }
+                });
+
+                TextView textView = new TextView(DetailsActivity.this);
+                textView.setText("Enter estimated meeting time in minutes");
+                int tvPadding = getResources().getDimensionPixelSize(R.dimen.dialog_message_padding_top);
+                textView.setPadding(tvPadding, tvPadding, tvPadding, tvPadding);
+                textView.setTextColor(Color.BLACK);
+
+                final EditText editText = new EditText(DetailsActivity.this);
+                editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+                LinearLayout linearLayout = new LinearLayout(DetailsActivity.this);
+                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                linearLayout.setPadding(tvPadding, 0, tvPadding, 0);
+
+                linearLayout.addView(chooseDateButton);
+                linearLayout.addView(chooseTimeButton);
+                linearLayout.addView(textView);
+                linearLayout.addView(editText);
+
+                builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(DetailsActivity.this);
+
+                        pearlyApi.addReservation(
+                                new Reservation(room.getId(),
+                                        prefs.getString(SettingsFragment.NICKNAME, ""),
+                                        prefs.getString(SettingsFragment.PHONE_NO, ""),
+                                        prefs.getString(SettingsFragment.SPARK_ID, ""),
+                                        System.currentTimeMillis(),
+                                        Integer.valueOf(editText.getText().toString()) * 1000 * 60));
+
+                        Toast.makeText(getApplicationContext(), "Reserved", Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                builder.setView(linearLayout);
+
+                builder.create().show();
+            }
+        });
     }
 
     private void initToolbar() {

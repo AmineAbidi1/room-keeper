@@ -3,10 +3,12 @@ package com.roomkeeper;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PersistableBundle;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -22,6 +24,7 @@ import android.widget.Toast;
 
 import com.roomkeeper.adapters.RoomsAdapter;
 import com.roomkeeper.details.DetailsActivity;
+import com.roomkeeper.models.Reservation;
 import com.roomkeeper.models.Room;
 import com.roomkeeper.models.RoomStatus;
 import com.roomkeeper.models.RoomStatuses;
@@ -29,6 +32,7 @@ import com.roomkeeper.models.Rooms;
 import com.roomkeeper.models.Status;
 import com.roomkeeper.network.PearlyApi;
 import com.roomkeeper.settings.SettingsActivity;
+import com.roomkeeper.settings.SettingsFragment;
 import com.roomkeeper.splashscreen.SplashScreen;
 
 import java.util.List;
@@ -109,8 +113,6 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
                 //TODO download only if status had changed
                 downloadStatuses();
                 scheduleRefresh();
-                //TODO delete for live demo
-                Toast.makeText(getApplicationContext(), "Refreshed", Toast.LENGTH_SHORT).show();
             }
         };
         scheduleRefresh();
@@ -141,7 +143,6 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
 
     private void downloadData() {
         downloadRooms();
-        downloadStatuses();
     }
 
     private void downloadRooms() {
@@ -160,13 +161,12 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
                 roomsAdapter.setItems(rooms);
                 roomsAdapter.notifyDataSetChanged();
 
-                swipeRefreshLayout.setRefreshing(false);
+                downloadStatuses();
             }
 
             @Override
             public void onFailure(Throwable t) {
                 Log.d(LOG_TAG, "Failed to download Statuse, response: " + t.getMessage());
-                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }
@@ -182,17 +182,20 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
                     long roomID = roomStatus.getRoomID();
                     Log.d(LOG_TAG, "roomID:" + roomID);
 
+                    //TODO set proper value to decide whether to change status
                     if (roomStatus.getNoiseLevel() > 10000) {
                         roomsAdapter.setColorForItem(roomID, Status.FREE);
                     } else {
                         roomsAdapter.setColorForItem(roomID, Status.RESERVED);
                     }
                 }
+                swipeRefreshLayout.setRefreshing(false);
             }
 
             @Override
             public void onFailure(Throwable t) {
                 Log.d(LOG_TAG, "Failed to download Statuses, response: " + t.getMessage());
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }
@@ -233,20 +236,27 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
     }
 
     @Override
-    public void onRoomLongClickedListener(Room room) {
-
+    public void onRoomLongClickedListener(final Room room) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("QUICK RESERVATION");
 
-        EditText editText = new EditText(this);
+        final EditText editText = new EditText(this);
         editText.setInputType(InputType.TYPE_CLASS_NUMBER);
 
         builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //TODO create reservation object
-//                pearlyApi.addReservation(new Reservation());
+                final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                pearlyApi.addReservation(
+                        new Reservation(room.getId(),
+                                prefs.getString(SettingsFragment.NICKNAME, ""),
+                                prefs.getString(SettingsFragment.PHONE_NO, ""),
+                                prefs.getString(SettingsFragment.SPARK_ID, ""),
+                                System.currentTimeMillis(),
+                                Integer.valueOf(editText.getText().toString()) * 1000 * 60));
+
+                Toast.makeText(getApplicationContext(), "Reserved", Toast.LENGTH_LONG).show();
             }
         });
 
