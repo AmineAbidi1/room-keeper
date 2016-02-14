@@ -260,15 +260,32 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-                pearlyApi.addReservation(
-                        new Reservation(room.getId(),
-                                prefs.getString(SettingsFragment.NICKNAME, ""),
-                                prefs.getString(SettingsFragment.PHONE_NO, ""),
-                                prefs.getString(SettingsFragment.SPARK_ID, ""),
-                                System.currentTimeMillis(),
-                                Integer.valueOf(editText.getText().toString()) * 1000 * 60));
 
-                Toast.makeText(getApplicationContext(), "Reserved", Toast.LENGTH_LONG).show();
+
+                String nickname = prefs.getString(SettingsFragment.NICKNAME, "");
+
+                if (nickname.equals("")) {
+                    Toast.makeText(getApplicationContext(), "You have to set Nickname in settings to proceed with reservations", Toast.LENGTH_LONG).show();
+                    dialog.dismiss();
+                    return;
+                }
+
+                if (!editText.getText().toString().equals("")) {
+                    Integer durationInMinutes = Integer.valueOf(editText.getText().toString());
+                    Reservation reservation = new Reservation(room.getId(),
+                            nickname,
+                            prefs.getString(SettingsFragment.PHONE_NO, ""),
+                            prefs.getString(SettingsFragment.SPARK_ID, ""),
+                            System.currentTimeMillis(),
+                            System.currentTimeMillis() + durationInMinutes * 1000 * 60);
+                    pearlyApi.addReservation(
+                            reservation);
+
+                    Toast.makeText(getApplicationContext(), "Reserved", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Duration not set, try again", Toast.LENGTH_LONG).show();
+                }
+
             }
         });
 

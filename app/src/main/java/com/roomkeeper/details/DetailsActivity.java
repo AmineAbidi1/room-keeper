@@ -109,19 +109,26 @@ public class DetailsActivity extends AppCompatActivity implements ReservationsAd
                 final Button chooseDateButton = new Button(DetailsActivity.this);
                 chooseDateButton.setText("Set Date");
 
+                final Calendar calendar = Calendar.getInstance();
+                final int[] yearRead = {calendar.get(Calendar.YEAR)};
+                final int[] monthRead = {calendar.get(Calendar.MONTH)};
+                final int[] dayRead = {calendar.get(Calendar.DAY_OF_MONTH)};
+                final int[] hourRead = {calendar.get(Calendar.HOUR_OF_DAY)};
+                final int[] minuteRead = {calendar.get(Calendar.MINUTE)};
+
                 chooseDateButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        final Calendar c = Calendar.getInstance();
-                        int year = c.get(Calendar.YEAR);
-                        final int month = c.get(Calendar.MONTH);
-                        int day = c.get(Calendar.DAY_OF_MONTH);
                         new DatePickerDialog(DetailsActivity.this, new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                                 chooseDateButton.setText("Date set to:    " + year + " " + monthOfYear + " " + dayOfMonth);
+
+                                yearRead[0] = year;
+                                monthRead[0] = monthOfYear;
+                                dayRead[0] = dayOfMonth;
                             }
-                        }, year, month, day).show();
+                        }, yearRead[0], monthRead[0], dayRead[0]).show();
                     }
                 });
 
@@ -131,17 +138,16 @@ public class DetailsActivity extends AppCompatActivity implements ReservationsAd
                 chooseTimeButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        final Calendar c = Calendar.getInstance();
-                        int hour = c.get(Calendar.HOUR_OF_DAY);
-                        int minute = c.get(Calendar.MINUTE);
 
                         // Create a new instance of TimePickerDialog and return it
                         new TimePickerDialog(DetailsActivity.this, new TimePickerDialog.OnTimeSetListener() {
                             @Override
                             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                                 chooseTimeButton.setText("Time set to:    " + hourOfDay + " : " + minute);
+                                hourRead[0] = hourOfDay;
+                                minuteRead[0] = minute;
                             }
-                        }, hour, minute, DateFormat.is24HourFormat(DetailsActivity.this)).show();
+                        }, hourRead[0], minuteRead[0], DateFormat.is24HourFormat(DetailsActivity.this)).show();
                     }
                 });
 
@@ -168,15 +174,35 @@ public class DetailsActivity extends AppCompatActivity implements ReservationsAd
                     public void onClick(DialogInterface dialog, int which) {
                         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(DetailsActivity.this);
 
-                        pearlyApi.addReservation(
-                                new Reservation(room.getId(),
-                                        prefs.getString(SettingsFragment.NICKNAME, ""),
-                                        prefs.getString(SettingsFragment.PHONE_NO, ""),
-                                        prefs.getString(SettingsFragment.SPARK_ID, ""),
-                                        System.currentTimeMillis(),
-                                        Integer.valueOf(editText.getText().toString()) * 1000 * 60));
+                        calendar.set(yearRead[0],
+                                monthRead[0],
+                                dayRead[0],
+                                hourRead[0],
+                                minuteRead[0]);
 
-                        Toast.makeText(getApplicationContext(), "Reserved", Toast.LENGTH_LONG).show();
+                        String nickname = prefs.getString(SettingsFragment.NICKNAME, "");
+
+                        if (nickname.equals("")) {
+                            Toast.makeText(getApplicationContext(), "You have to set Nickname in settings to proceed with reservations", Toast.LENGTH_LONG).show();
+                            dialog.dismiss();
+                            return;
+                        }
+
+                        if (!editText.getText().toString().equals("")) {
+                            Integer durationInMinutes = Integer.valueOf(editText.getText().toString());
+                            Reservation reservation = new Reservation(room.getId(),
+                                    prefs.getString(SettingsFragment.NICKNAME, ""),
+                                    prefs.getString(SettingsFragment.PHONE_NO, ""),
+                                    prefs.getString(SettingsFragment.SPARK_ID, ""),
+                                    calendar.getTimeInMillis(),
+                                    calendar.getTimeInMillis() + durationInMinutes * 1000 * 60);
+                        pearlyApi.addReservation(
+                                reservation);
+
+                            Toast.makeText(getApplicationContext(), "Reserved", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Duration not set, try again", Toast.LENGTH_LONG).show();
+                        }
                     }
                 });
 
