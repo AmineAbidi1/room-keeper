@@ -12,6 +12,7 @@ public class Room implements Serializable {
     private String description;
     private String image;
     private Status status;
+    private String capacity;
     private int time;
 
     public Room(String title, String description) {
@@ -52,5 +53,9 @@ public class Room implements Serializable {
         String time = sdf.format(new Date(System.currentTimeMillis()));
 
         return time;
+    }
+
+    public String getCapacity() {
+        return capacity;
     }
 }

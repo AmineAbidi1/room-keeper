@@ -11,9 +11,17 @@ public class Reservation {
     @Expose
     private String nickname;
     @Expose
-    private String startTime;
+    private long startTime;
     @Expose
-    private String endTime;
+    private long endTime;
+
+    public Reservation(long id, String roomID, String nickname, long startTime, long endTime) {
+        this.id = id;
+        this.roomID = roomID;
+        this.nickname = nickname;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
 
     public String getRoomID() {
         return roomID;
@@ -23,11 +31,11 @@ public class Reservation {
         return nickname;
     }
 
-    public String getStartTime() {
+    public long getStartTime() {
         return startTime;
     }
 
-    public String getEndTime() {
+    public long getEndTime() {
         return endTime;
     }
 }
