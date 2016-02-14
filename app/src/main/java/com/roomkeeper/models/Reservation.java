@@ -44,10 +44,18 @@ public class Reservation {
     }
 
     public long getStartTime() {
-        return Long.parseLong(startTime);
+        try {
+            return Long.parseLong(startTime);
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
     }
 
     public long getEndTime() {
-        return Long.parseLong(endTime);
+        try {
+            return Long.parseLong(endTime);
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
     }
 }
