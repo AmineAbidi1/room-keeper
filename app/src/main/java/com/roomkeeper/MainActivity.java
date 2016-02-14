@@ -2,8 +2,6 @@ package com.roomkeeper;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,7 +9,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.roomkeeper.adapters.RoomsAdapter;
 import com.roomkeeper.details.DetailsActivity;
@@ -21,6 +18,7 @@ import com.roomkeeper.models.RoomStatuses;
 import com.roomkeeper.models.Rooms;
 import com.roomkeeper.models.Status;
 import com.roomkeeper.network.PearlyApi;
+import com.roomkeeper.settings.SettingsActivity;
 
 import java.util.List;
 
@@ -132,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 

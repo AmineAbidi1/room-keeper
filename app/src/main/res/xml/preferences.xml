@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Phone Notifications">
+        <EditTextPreference
+            android:defaultValue=""
+            android:dialogMessage="This will allow notifications by SMS"
+            android:dialogTitle="Enter your phone number"
+            android:inputType="phone"
+            android:key="phone_no"
+            android:persistent="true"
+            android:summary="Enter your phone number"
+            android:title="Phone Number" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="sms_notifications"
+            android:persistent="true"
+            android:title="SMS Notifications" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Spark Notifications">
+        <EditTextPreference
+            android:defaultValue=""
+            android:dialogMessage="This will allow notifications using Spark"
+            android:dialogTitle="Enter your Spark ID"
+            android:key="spark_id"
+            android:persistent="true"
+            android:summary="Enter your Spark ID"
+            android:title="Spark ID" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="spark_notifications"
+            android:persistent="true"
+            android:title="Spark Notifications" />
+    </PreferenceCategory>
+
+
+</PreferenceScreen>
