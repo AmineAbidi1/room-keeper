@@ -11,7 +11,6 @@ import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.Path;
-import retrofit2.http.Headers;
 
 public interface PearlyApi {
 
@@ -27,9 +26,7 @@ public interface PearlyApi {
 
     @GET("https://pure-dawn-88641.herokuapp.com/api/v1/reservations/{roomID}.json")
     Call<Reservations> getReservations(@Path("roomID") long roomID);
-
-
-    @Headers("Content-Type: application/json")
+    
     @POST("https://pure-dawn-88641.herokuapp.com/api/v1/bookRoom")
     Call<Reservation> addReservation(@Body Reservation reservation);
 

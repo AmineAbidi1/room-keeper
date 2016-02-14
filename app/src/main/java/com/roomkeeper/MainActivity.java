@@ -278,8 +278,20 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
                             prefs.getString(SettingsFragment.SPARK_ID, ""),
                             System.currentTimeMillis(),
                             System.currentTimeMillis() + durationInMinutes * 1000 * 60);
-                    pearlyApi.addReservation(
+                    Call<Reservation> reservationCall = pearlyApi.addReservation(
                             reservation);
+                    reservationCall.enqueue(new Callback<Reservation>() {
+                        @Override
+                        public void onResponse(Response<Reservation> response, Retrofit retrofit) {
+
+                        }
+
+                        @Override
+                        public void onFailure(Throwable t) {
+
+                        }
+                    });
+
 
                     Toast.makeText(getApplicationContext(), "Reserved", Toast.LENGTH_LONG).show();
                 } else {
