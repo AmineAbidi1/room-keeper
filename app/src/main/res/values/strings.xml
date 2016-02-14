@@ -7,4 +7,5 @@
     <string name="noise">%d ?</string>
     <string name="brightness">%d LUX</string>
     <string name="humidity">%d %</string>
+    <string name="will_expire">Room reserved by %s will be available in:</string>
 </resources>

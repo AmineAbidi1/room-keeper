@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.roomkeeper.R;
+import com.roomkeeper.Tools;
 import com.roomkeeper.models.Reservation;
 import com.roomkeeper.models.Room;
 import com.roomkeeper.models.RoomStatus;
@@ -77,25 +78,53 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         // It should be added sensor data!
         Status status = getStatus(room, roomStatus);
 
-        int backGroundColor;
         switch (status) {
             case FREE:
-                backGroundColor = Color.GREEN;
+                holder.status.setBackgroundColor(Color.GREEN);
+                if (roomStatus != null) {
+                    if (roomStatus.getOpenTimeLeft() > 0) {
+                        String time = Tools.formatTime(roomStatus.getOpenTimeLeft());
+                        holder.time.setText(time);
+                    } else {
+                        holder.time.setText("∞");
+                    }
+
+                    holder.description.setText("Room is available for:");
+                } else {
+                    holder.description.setText("No reservations for today");
+                    holder.time.setText("");
+                }
+
                 break;
             case RESERVED:
-                backGroundColor = Color.RED;
+                holder.status.setBackgroundColor(Color.RED);
+                if (roomStatus != null) {
+                    String time = Tools.formatTime(roomStatus.getReservationTimeLeft());
+                    holder.time.setText(time);
+
+                    String description = holder.description.getContext().getString(R.string.will_expire, roomStatus.getCurrentReservation().getNickname());
+                    holder.description.setText(description);
+                }
+
                 break;
             case RESERVED_LOCALLY:
-                backGroundColor = ContextCompat.getColor(holder.image.getContext(), android.R.color.holo_orange_dark);
+                holder.status.setBackgroundColor(ContextCompat.getColor(holder.image.getContext(), android.R.color.holo_orange_dark));
+                if (roomStatus != null) {
+                    String time = Tools.formatTime(roomStatus.getReservationTimeLeft());
+                    holder.time.setText(time);
+                    holder.description.setText("Your reservation will expire in :");
+                }
                 break;
             default:
-                backGroundColor = Color.GREEN;
+                holder.status.setBackgroundColor(Color.GREEN);
+                holder.time.setText("");
+                holder.description.setText("No room status");
+                break;
         }
 
-        holder.status.setBackgroundColor(backGroundColor);
 
         holder.title.setText(room.getTitle());
-        holder.time.setText(room.getTime());
+
 
         Glide.with(holder.image.getContext())
                 .load(room.getImage())
@@ -128,6 +157,9 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         @Bind(R.id.time)
         TextView time;
+
+        @Bind(R.id.description)
+        TextView description;
 
         public ItemViewHolder(View v) {
             super(v);

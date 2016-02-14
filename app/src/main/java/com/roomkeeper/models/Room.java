@@ -48,12 +48,7 @@ public class Room implements Serializable {
         this.status = status;
     }
 
-    public String getTime() {
-        SimpleDateFormat sdf = new SimpleDateFormat("mm-ss", Locale.getDefault());
-        String time = sdf.format(new Date(System.currentTimeMillis()));
 
-        return time;
-    }
 
     public String getCapacity() {
         return capacity;

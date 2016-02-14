@@ -10,10 +10,10 @@ public class Reservation {
     private long roomID;
     @Expose
     private String nickname;
-    @Expose
+
     private String sparkID;
-    @Expose
     private String phoneNO;
+
     @Expose
     private long startTime;
     @Expose

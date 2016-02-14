@@ -16,6 +16,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -27,19 +28,24 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 import com.roomkeeper.R;
 import com.roomkeeper.details.adapters.ReservationsAdapter;
 import com.roomkeeper.models.Reservation;
 import com.roomkeeper.models.Room;
 import com.roomkeeper.models.RoomStatus;
+import com.roomkeeper.models.Rooms;
 import com.roomkeeper.network.PearlyApi;
 import com.roomkeeper.settings.SettingsFragment;
 
 import java.util.Calendar;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import retrofit.Callback;
 import retrofit.GsonConverterFactory;
+import retrofit.Response;
 import retrofit.Retrofit;
 
 public class DetailsActivity extends AppCompatActivity implements ReservationsAdapter.OnItemSelectedListener {
@@ -76,6 +82,7 @@ public class DetailsActivity extends AppCompatActivity implements ReservationsAd
                 .baseUrl("http://dziubinski.eu/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+
 
         pearlyApi = retrofit.create(PearlyApi.class);
 
@@ -196,8 +203,22 @@ public class DetailsActivity extends AppCompatActivity implements ReservationsAd
                                     prefs.getString(SettingsFragment.SPARK_ID, ""),
                                     calendar.getTimeInMillis(),
                                     calendar.getTimeInMillis() + durationInMinutes * 1000 * 60);
-                        pearlyApi.addReservation(
-                                reservation);
+
+
+                            pearlyApi.addReservation(
+                                    reservation)
+                                    .enqueue(new Callback<Reservation>() {
+                                        @Override
+                                        public void onResponse(Response<Reservation> response, Retrofit retrofit) {
+
+                                        }
+
+                                        @Override
+                                        public void onFailure(Throwable t) {
+                                            Log.d("", "");
+
+                                        }
+                                    });
 
                             Toast.makeText(getApplicationContext(), "Reserved", Toast.LENGTH_LONG).show();
                         } else {

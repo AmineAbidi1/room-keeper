@@ -35,8 +35,21 @@ public class RoomStatus {
         return temperature;
     }
 
-    public boolean isStatus() {
-        return getNoiseLevel() < 50;
+    public long getReservationTimeLeft() {
+        return getCurrentReservation().getEndTime() - System.currentTimeMillis();
+    }
+
+    public long getOpenTimeLeft() {
+        if (getCurrentReservation() != null) {
+            return 0;
+        }
+
+        if (getNextReservation() != null) {
+            return getNextReservation().getStartTime() - System.currentTimeMillis();
+        } else {
+            return 0;
+        }
+
     }
 
     public Reservation getCurrentReservation() {
