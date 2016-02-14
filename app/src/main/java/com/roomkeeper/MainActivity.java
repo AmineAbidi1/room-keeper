@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
         GridLayoutManager mLayoutManager = new GridLayoutManager(this, columnsNumber);
         recyclerView.setLayoutManager(mLayoutManager);
 
-        roomsAdapter = new RoomsAdapter(this);
+        roomsAdapter = new RoomsAdapter(this, this);
         recyclerView.setAdapter(roomsAdapter);
 
         setupSwipeRefresh(swipeRefreshLayout);

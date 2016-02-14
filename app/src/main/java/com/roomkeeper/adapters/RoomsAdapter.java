@@ -1,5 +1,6 @@
 package com.roomkeeper.adapters;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -32,9 +33,11 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private OnItemSelectedListener listener;
     private Map<Long, RoomStatus> statuses = new HashMap<>();
 
+    private Context context;
 
-    public RoomsAdapter(OnItemSelectedListener listener) {
+    public RoomsAdapter(Context context, OnItemSelectedListener listener) {
         this.listener = listener;
+        this.context = context;
     }
 
     public void setItems(List<Room> items) {
@@ -57,7 +60,9 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             return Status.FREE;
         }
 
-        if (status.getCurrentReservation().getNickname().equals("Adam")) {
+        String currentUser = Tools.getCurrentUser(context);
+
+        if (status.getCurrentReservation().getNickname().equals(currentUser)) {
             return Status.RESERVED_LOCALLY;
         } else {
             if (status.getNoiseLevel() > 50) {
