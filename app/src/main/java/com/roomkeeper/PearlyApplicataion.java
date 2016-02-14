@@ -2,9 +2,6 @@ package com.roomkeeper;
 
 import android.app.Application;
 
-import io.relayr.android.RelayrSdk;
-
-
 public class PearlyApplicataion extends Application {
 
     @Override
@@ -13,7 +10,6 @@ public class PearlyApplicataion extends Application {
 
         initImageLoader();
 
-//        new RelayrSdk.Builder(this).inMockMode(false).build();
     }
 
     private void initImageLoader() {
