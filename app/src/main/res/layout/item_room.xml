@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp">
 
     <LinearLayout
-        android:id="@+id/item_room_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -38,6 +38,14 @@
                 android:text="Room #5"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#FFF" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/status_container"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            tools:background="#FF0000">
 
         </FrameLayout>
 

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.roomkeeper.R;
 import com.roomkeeper.models.Room;
 import com.roomkeeper.models.Status;
@@ -61,14 +62,15 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 backGroundColor = Color.GREEN;
         }
 
-        holder.container.setBackgroundColor(backGroundColor);
+        holder.status.setBackgroundColor(backGroundColor);
 
         holder.titile.setText(room.getTitle());
         holder.time.setText(room.getTime());
 
-        //holder.description.setText(room.getDescription());
-        //holder.time.setText(room.getStatus());
-        //ImageLoader.getInstance().displayImage(room.getImage(), holder.image);
+        Glide.with(holder.image.getContext())
+                .load(room.getImage())
+                .placeholder(R.drawable.conference)
+                .into(holder.image);
     }
 
     @Override
@@ -90,14 +92,16 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
+
         @Bind(R.id.image)
-        public ImageView image;
-        @Bind(R.id.item_room_container)
-        View container;
+        ImageView image;
+
+        @Bind(R.id.status_container)
+        View status;
+
         @Bind(R.id.name)
         TextView titile;
-        @Bind(R.id.description)
-        TextView description;
+
         @Bind(R.id.time)
         TextView time;
 
