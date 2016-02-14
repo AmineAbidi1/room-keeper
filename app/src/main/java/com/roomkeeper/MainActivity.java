@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PersistableBundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.roomkeeper.adapters.RoomsAdapter;
 import com.roomkeeper.details.DetailsActivity;
@@ -54,6 +56,9 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
 
     private RoomsAdapter roomsAdapter;
     private PearlyApi pearlyApi;
+
+    private Handler handler;
+    private Runnable refreshDataTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +102,22 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
 
         downloadData();
 
+        handler = new Handler();
+        refreshDataTask = new Runnable() {
+            @Override
+            public void run() {
+                //TODO download only if status had changed
+                downloadStatuses();
+                scheduleRefresh();
+                //TODO delete for live demo
+                Toast.makeText(getApplicationContext(), "Refreshed", Toast.LENGTH_SHORT).show();
+            }
+        };
+        scheduleRefresh();
+    }
+
+    private void scheduleRefresh() {
+        handler.postDelayed(refreshDataTask, 10000);
     }
 
     public void setupSwipeRefresh(SwipeRefreshLayout view) {
@@ -110,20 +131,20 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
-
         outState.putBoolean("oldInstance", true);
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
     }
 
     private void downloadData() {
+        downloadRooms();
+        downloadStatuses();
+    }
 
-
+    private void downloadRooms() {
         //TODO change call whenever pearly api is ready
         Call<Rooms> roomsCall = pearlyApi.getRooms();
 
@@ -148,7 +169,9 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
+    }
 
+    private void downloadStatuses() {
         Call<RoomStatuses> statusesCall = pearlyApi.getStatuses();
 
         statusesCall.enqueue(new Callback<RoomStatuses>() {
