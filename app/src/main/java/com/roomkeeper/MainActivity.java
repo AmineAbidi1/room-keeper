@@ -2,6 +2,8 @@ package com.roomkeeper;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.roomkeeper.adapters.RoomsAdapter;
 import com.roomkeeper.details.DetailsActivity;
@@ -19,6 +22,7 @@ import com.roomkeeper.models.Rooms;
 import com.roomkeeper.models.Status;
 import com.roomkeeper.network.PearlyApi;
 import com.roomkeeper.settings.SettingsActivity;
+import com.roomkeeper.splashscreen.SplashScreen;
 
 import java.util.List;
 
@@ -30,12 +34,19 @@ import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
-public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnItemSelectedListener, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String LOG_TAG = "MainActivityTag";
 
     @Bind(R.id.list)
     RecyclerView recyclerView;
+
+    @Bind(R.id.splash)
+    SplashScreen splash;
+
+    @Bind(R.id.refresh_container)
+    SwipeRefreshLayout swipeRefreshLayout;
+
     private RoomsAdapter roomsAdapter;
 
     @Override
@@ -54,7 +65,38 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
         roomsAdapter = new RoomsAdapter(this);
         recyclerView.setAdapter(roomsAdapter);
 
+        setupSwipeRefresh(swipeRefreshLayout);
+
+
+        if (savedInstanceState == null) {
+            splash.startAnimation();
+        } else {
+            splash.setVisibility(View.GONE);
+        }
+
         downloadData();
+
+    }
+
+    public void setupSwipeRefresh(SwipeRefreshLayout view) {
+        view.setOnRefreshListener(this);
+        view.setEnabled(true);
+        view.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light, android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+
+        outState.putBoolean("oldInstance", true);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
 
     }
 
@@ -81,11 +123,14 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
 
                 roomsAdapter.setItems(rooms);
                 roomsAdapter.notifyDataSetChanged();
+
+                swipeRefreshLayout.setRefreshing(false);
             }
 
             @Override
             public void onFailure(Throwable t) {
                 Log.d(LOG_TAG, "Failed to download Statuse, response: " + t.getMessage());
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
 
@@ -143,5 +188,10 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
         Intent intent = new Intent(this, DetailsActivity.class);
         intent.putExtra(DetailsActivity.EXTRA_ROOM, room);
         startActivity(intent);
+    }
+
+    @Override
+    public void onRefresh() {
+        downloadData();
     }
 }
