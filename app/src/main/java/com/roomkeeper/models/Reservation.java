@@ -1,6 +1,7 @@
 package com.roomkeeper.models;
 
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 public class Reservation {
 
@@ -15,8 +16,10 @@ public class Reservation {
     private String phoneNO;
 
     @Expose
+    @SerializedName("start_time")
     private String startTime;
     @Expose
+    @SerializedName("end_time")
     private String endTime;
 
     public Reservation(long id, long roomID, String nickname, long startTime, long endTime) {
