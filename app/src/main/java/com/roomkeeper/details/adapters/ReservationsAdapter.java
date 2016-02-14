@@ -37,13 +37,6 @@ public class ReservationsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         this.context = context;
         this.listener = listener;
 
-        items.add(new Reservation(1, 1, "Mark", System.currentTimeMillis() + 10000, System.currentTimeMillis() + 20000));
-        items.add(new Reservation(2, 1, "John", System.currentTimeMillis() + 20000, System.currentTimeMillis() + 30000));
-        items.add(new Reservation(3, 1, "Greg", System.currentTimeMillis() + 30000, System.currentTimeMillis() + 40000));
-        items.add(new Reservation(4, 1, "Johanson", System.currentTimeMillis() + 40000, System.currentTimeMillis() + 50000));
-        items.add(new Reservation(5, 1, "Andrew", System.currentTimeMillis() + 50000, System.currentTimeMillis() + 60000));
-        items.add(new Reservation(6, 1, "Rosa", System.currentTimeMillis() + 60000, System.currentTimeMillis() + 70000));
-
     }
 
     public void setRoom(Room room) {
@@ -91,6 +84,10 @@ public class ReservationsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return VIEW_TYPE_RESERVATION;
     }
 
+    public Reservation getItemForAdapterPosition(int position) {
+        return items.get(position - 2);
+    }
+
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder input, int position) {
 
@@ -99,7 +96,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
             ReservationViewHolder holder = (ReservationViewHolder) input;
 
-            Reservation reservation = items.get(position);
+            Reservation reservation = getItemForAdapterPosition(position);
 
             String description = holder.description.getContext().getString(R.string.reservation_pattern, reservation.getNickname());
             holder.description.setText(description);
@@ -135,7 +132,7 @@ public class ReservationsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return items.size() + 2;
     }
 
     public interface OnItemSelectedListener {

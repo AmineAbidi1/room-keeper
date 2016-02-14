@@ -28,13 +28,12 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.gson.Gson;
 import com.roomkeeper.R;
 import com.roomkeeper.details.adapters.ReservationsAdapter;
 import com.roomkeeper.models.Reservation;
+import com.roomkeeper.models.Reservations;
 import com.roomkeeper.models.Room;
 import com.roomkeeper.models.RoomStatus;
-import com.roomkeeper.models.Rooms;
 import com.roomkeeper.network.PearlyApi;
 import com.roomkeeper.settings.SettingsFragment;
 
@@ -43,6 +42,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import retrofit.Call;
 import retrofit.Callback;
 import retrofit.GsonConverterFactory;
 import retrofit.Response;
@@ -100,6 +100,31 @@ public class DetailsActivity extends AppCompatActivity implements ReservationsAd
         reservationAdapter.setRoom(room);
 
         recyclerView.setAdapter(reservationAdapter);
+
+        downloadReservations();
+    }
+
+    public void downloadReservations() {
+        Call<Reservations> roomsCall = pearlyApi.getReservations(room.getId());
+
+        //asynchronous call
+        roomsCall.enqueue(new Callback<Reservations>() {
+            @Override
+            public void onResponse(Response<Reservations> response, Retrofit retrofit) {
+                if (response == null) {
+                    return;
+                }
+                List<Reservation> rooms = response.body().getReservations();
+                reservationAdapter.setItems(rooms);
+                reservationAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d("Error", "Failed to download Statuse, response: " + t.getMessage());
+            }
+        });
+
     }
 
     private void setUpAddingReservationDialogs() {
