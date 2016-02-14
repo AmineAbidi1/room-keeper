@@ -15,24 +15,24 @@ public class Reservation {
     private String phoneNO;
 
     @Expose
-    private long startTime;
+    private String startTime;
     @Expose
-    private long endTime;
+    private String endTime;
 
     public Reservation(long id, long roomID, String nickname, long startTime, long endTime) {
         this.id = id;
         this.roomID = roomID;
         this.nickname = nickname;
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.startTime = String.valueOf(startTime);
+        this.endTime = String.valueOf(endTime);
     }
 
     public Reservation(long roomID, String nickname, String phoneNO, String sparkID, long startTime, long endTime) {
         this.id = id;
         this.roomID = roomID;
         this.nickname = nickname;
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.startTime = String.valueOf(startTime);
+        this.endTime = String.valueOf(endTime);
     }
 
     public long getRoomID() {
@@ -44,10 +44,10 @@ public class Reservation {
     }
 
     public long getStartTime() {
-        return startTime;
+        return Long.parseLong(startTime);
     }
 
     public long getEndTime() {
-        return endTime;
+        return Long.parseLong(endTime);
     }
 }
