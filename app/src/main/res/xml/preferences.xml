@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <PreferenceCategory android:title="Nickname">
+        <EditTextPreference
+            android:defaultValue=""
+            android:dialogMessage="This will allow other users to identify you"
+            android:dialogTitle="Enter your nickname"
+            android:key="nickname"
+            android:persistent="true"
+            android:summary="Enter your nickname"
+            android:title="Reservations nickname" />
+
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="Phone Notifications">
         <EditTextPreference
             android:defaultValue=""

@@ -14,7 +14,7 @@ import retrofit.http.Path;
 public interface PearlyApi {
 
     //TODO change when pearly api calls are there
-    @GET("http://public.dziubinski.eu/pearly/getRooms.json")
+    @GET("https://pure-dawn-88641.herokuapp.com/api/v1/getRooms.json")
     Call<Rooms> getRooms();
 
     //TODO change when pearly api calls are there

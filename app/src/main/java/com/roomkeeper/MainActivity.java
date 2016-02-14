@@ -1,6 +1,9 @@
 package com.roomkeeper;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -8,10 +11,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 
 import com.roomkeeper.adapters.RoomsAdapter;
 import com.roomkeeper.details.DetailsActivity;
@@ -48,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
     SwipeRefreshLayout swipeRefreshLayout;
 
     private RoomsAdapter roomsAdapter;
+    private PearlyApi pearlyApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +65,22 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
 
         ButterKnife.bind(this);
 
-        GridLayoutManager mLayoutManager = new GridLayoutManager(this, 2);
+        Retrofit retrofit = new Retrofit.Builder()
+                //TODO change whenever pearly api is ready
+                .baseUrl("http://dziubinski.eu/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        pearlyApi = retrofit.create(PearlyApi.class);
+
+        int columnsNumber;
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            columnsNumber = 3;
+        } else {
+            columnsNumber = 2;
+        }
+
+        GridLayoutManager mLayoutManager = new GridLayoutManager(this, columnsNumber);
         recyclerView.setLayoutManager(mLayoutManager);
 
         roomsAdapter = new RoomsAdapter(this);
@@ -101,13 +122,7 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
     }
 
     private void downloadData() {
-        Retrofit retrofit = new Retrofit.Builder()
-                //TODO change whenever pearly api is ready
-                .baseUrl("http://dziubinski.eu/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
 
-        PearlyApi pearlyApi = retrofit.create(PearlyApi.class);
 
         //TODO change call whenever pearly api is ready
         Call<Rooms> roomsCall = pearlyApi.getRooms();
@@ -182,7 +197,6 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
         return super.onOptionsItemSelected(item);
     }
 
-
     @Override
     public void onRoomSelectedListener(Room room) {
         Intent intent = new Intent(this, DetailsActivity.class);
@@ -193,5 +207,36 @@ public class MainActivity extends AppCompatActivity implements RoomsAdapter.OnIt
     @Override
     public void onRefresh() {
         downloadData();
+    }
+
+    @Override
+    public void onRoomLongClickedListener(Room room) {
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("QUICK RESERVATION");
+
+        EditText editText = new EditText(this);
+        editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //TODO create reservation object
+//                pearlyApi.addReservation(new Reservation());
+            }
+        });
+
+        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.setView(editText);
+
+        builder.setMessage("Enter estimated meeting time in minutes");
+        builder.create().show();
     }
 }

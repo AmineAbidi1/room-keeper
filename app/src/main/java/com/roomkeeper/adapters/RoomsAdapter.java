@@ -64,7 +64,7 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         holder.status.setBackgroundColor(backGroundColor);
 
-        holder.titile.setText(room.getTitle());
+        holder.title.setText(room.getTitle());
         holder.time.setText(room.getTime());
 
         Glide.with(holder.image.getContext())
@@ -89,6 +89,8 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public interface OnItemSelectedListener {
         void onRoomSelectedListener(Room room);
+
+        void onRoomLongClickedListener(Room room);
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
@@ -100,7 +102,7 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         View status;
 
         @Bind(R.id.name)
-        TextView titile;
+        TextView title;
 
         @Bind(R.id.time)
         TextView time;
@@ -115,8 +117,15 @@ public class RoomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     listener.onRoomSelectedListener(items.get(getAdapterPosition()));
                 }
             });
-        }
 
+            v.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    listener.onRoomLongClickedListener(items.get(getAdapterPosition()));
+                    return false;
+                }
+            });
+        }
 
     }
 }

@@ -11,6 +11,7 @@ import com.roomkeeper.R;
 
 public class SettingsFragment extends PreferenceFragment {
 
+    public static final String NICKNAME = "nickname";
     public static final String PHONE_NO = "phone_no";
     public static final String SPARK_ID = "spark_id";
 
@@ -21,8 +22,26 @@ public class SettingsFragment extends PreferenceFragment {
 
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
+        final EditTextPreference nicknamePreference = (EditTextPreference) findPreference("nickname");
+        String nickname = prefs.getString(NICKNAME, "");
+        if (!nickname.equals("")) {
+            nicknamePreference.setSummary(nickname);
+        }
+        nicknamePreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                String nickName = (String) newValue;
+                prefs.edit().putString(NICKNAME, nickName).apply();
+                nicknamePreference.setSummary(nickName);
+                return true;
+            }
+        });
+
         final EditTextPreference phoneNOPreference = (EditTextPreference) findPreference("phone_no");
-        phoneNOPreference.setSummary(prefs.getString(PHONE_NO, ""));
+        String phoneNo = prefs.getString(PHONE_NO, "");
+        if (!phoneNo.equals("")) {
+            phoneNOPreference.setSummary(phoneNo);
+        }
         phoneNOPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -34,7 +53,10 @@ public class SettingsFragment extends PreferenceFragment {
         });
 
         final EditTextPreference sparkIDPreference = (EditTextPreference) findPreference("spark_id");
-        sparkIDPreference.setSummary(prefs.getString(SPARK_ID, ""));
+        String sparkID = prefs.getString(SPARK_ID, "");
+        if (!sparkID.equals("")) {
+            sparkIDPreference.setSummary(sparkID);
+        }
         sparkIDPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
